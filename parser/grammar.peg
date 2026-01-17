@@ -1,0 +1,91 @@
+# Robot Language v1 - PEG Grammar
+
+# -------------------------
+# 1. Lexical Rules (Tokens)
+# -------------------------
+
+Whitespace <- [ \t\r\n]+
+
+Comment <- '(' (!')' .)* ')'
+
+Identifier <- [a-z] ([a-z] / '-')*
+
+Digit <- [0-9]
+Integer <- Digit+
+Decimal <- Digit+ '.' Digit+
+Fraction <- Integer '/' Integer
+Number <- Decimal / Fraction / Integer
+
+Unit <- 'in' / 'cm' / 'mm' / 'm' / 'ft'
+
+String <- '""' (!'"' .)* '"'
+
+# -------------------------
+# 2. Program Structure
+# -------------------------
+
+Program <- (Whitespace/ Comment) * PreAutonFunction * AutonFunction * DriverFunction (Whitespace/ Comment)*
+
+# -------------------------
+# 3. Functions
+# -------------------------
+
+PreAutonFunction <- 'pre-auton' FunctionBody
+AutonFunction <- 'auton' FunctionBody
+DriverFunction <- 'driver' FunctionBody
+
+FunctionBody <- '{' FunctionElement* '}'
+
+FunctionElement <- Comment
+                / Statement
+                / Section
+                / Whitespace
+
+# -------------------------
+# 4. Sections
+# -------------------------
+
+Section <- SectionName ':' SectionElement*
+SectionName <- Identifier
+SectionElement <- Comment
+                / Assignment
+                / Whitespace
+
+# -------------------------
+# 5. Statements
+# -------------------------
+
+Statement <- Command '.'
+
+Command <- CalibrateCommand
+        / MoveCommand
+
+CalibrateCommand <- 'calibrate-imu'
+
+MoveCommand <- 'move' Direction MoveTarget
+Direction <- 'fwd' / 'bwd'
+MoveTarget <- Number Unit
+           / 'forever'
+
+# -------------------------
+# 6. Assignments
+# -------------------------
+
+Assignment <- Identifier '=' Value
+Value <- Number
+       / Fraction
+       / String
+
+# -------------------------
+# Notes for Driver-Specific Sections & Semantics
+# -------------------------
+
+# Semantics Rules (not enforcable in PEG):
+# 1. Exactly three functions must exist: pre-auton, auton, and driver
+# 2. Each function appears exactly once
+# 3. drive-pid and turn-pid must appear in pre-auton
+# 4. drive-pid and turn-pid must define p, i, d
+# 5. Assignments must not end with '.'
+# 6. Statements must end with '.'
+# 7. Sections must not be nested
+# 8. Curly braces appear only in functions
