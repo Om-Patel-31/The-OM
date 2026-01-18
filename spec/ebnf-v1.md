@@ -160,7 +160,7 @@ auton {
 
 driver {
     axis:
-        driver = 3
+        drive = 3
         turn = 1
 }
 $

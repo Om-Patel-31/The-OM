@@ -1,0 +1,23 @@
+pre-auton {
+    calibrate-imu.
+
+    drive-pid:
+        p = 3.0
+        i = 0.01
+        d = 0.001
+    
+    turn-pid:
+        p = 1.2
+        i = 0.0
+        d = 0.1
+}
+
+auton {
+    move fwd 24 in.
+}
+
+driver {
+    axis:
+        drive = 3
+        turn = 1
+}
